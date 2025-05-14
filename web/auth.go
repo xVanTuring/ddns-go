@@ -2,6 +2,7 @@ package web
 
 import (
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/jeessy2/ddns-go/v6/config"
@@ -16,7 +17,18 @@ func Auth(f ViewFunc) ViewFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cookieInWeb, err := r.Cookie(cookieName)
 		if err != nil {
-			http.Redirect(w, r, "./login", http.StatusTemporaryRedirect)
+			// 从环境变量中读取 BASE_URL
+			baseURL := os.Getenv("BASE_URL")
+			if baseURL == "" {
+				baseURL = "/" // 如果未设置 BASE_URL，则默认为根路径
+			}
+
+			// 确保 baseURL 以斜杠结尾
+			if baseURL[len(baseURL)-1] != '/' {
+				baseURL += "/"
+			}
+
+			http.Redirect(w, r, baseURL+"login", http.StatusTemporaryRedirect)
 			return
 		}
 
@@ -39,7 +51,18 @@ func Auth(f ViewFunc) ViewFunc {
 			return
 		}
 
-		http.Redirect(w, r, "./login", http.StatusTemporaryRedirect)
+		// 从环境变量中读取 BASE_URL
+		baseURL := os.Getenv("BASE_URL")
+		if baseURL == "" {
+			baseURL = "/" // 如果未设置 BASE_URL，则默认为根路径
+		}
+
+		// 确保 baseURL 以斜杠结尾
+		if baseURL[len(baseURL)-1] != '/' {
+			baseURL += "/"
+		}
+
+		http.Redirect(w, r, baseURL+"login", http.StatusTemporaryRedirect)
 	}
 }
 
